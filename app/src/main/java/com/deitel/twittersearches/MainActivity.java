@@ -69,6 +69,7 @@ public class MainActivity extends Activity
       
       // MOVE to ListFragment _  set listener that allows user to delete or edit a search
       //getListView().setOnItemLongClickListener(itemLongClickListener);
+       getFragmentManager().beginTransaction().add(R.id.fragment_holder,new FirstFragment()).commit();
    } // end method onCreate
 
    // NO CHANGES _  saveButtonListener saves a tag-query pair into SharedPreferences
@@ -116,7 +117,8 @@ public class MainActivity extends Activity
       SharedPreferences.Editor preferencesEditor = savedSearches.edit();
       preferencesEditor.putString(tag, query); // store current search
       preferencesEditor.apply(); // store the updated preferences
-      
+      Collections.sort(tags,String.CASE_INSENSITIVE_ORDER);
+       adapter.notifyDataSetChanged();
       // if tag is new, add to and sort tags, then display updated list
       if (!tags.contains(tag))
       {
@@ -275,6 +277,19 @@ public class MainActivity extends Activity
    // ADDED to set up the ListFragment
    public ArrayAdapter<String> getAdapter(){return adapter;}
 
+    public void onBackPressed(){
+        if(getFragmentManager().getBackStackEntryCount() > 0){
+            getFragmentManager().popBackStack();
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    public void sendToSecondFrag(String query) {
+        String urlString = getString(R.string.searchURL) +
+                Uri.encode(savedSearches.getString(query, ""), "UTF-8");
+        getFragmentManager().beginTransaction().replace(R.id.fragment_holder,SecondFragment.newInstance(urlString)).addToBackStack(null).commit();
+    }
 } // end class MainActivity
 
 
